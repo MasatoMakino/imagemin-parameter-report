@@ -18,61 +18,43 @@ const imgExtension = "+(jpg|jpeg|png|gif|svg)";
  * @param extensions
  * @returns {*}
  */
-const getImageList = (srcDir, extensions) => {
+const getImageList = (srcRoot, subDir, extensions) => {
   const pattern = `**/*.${extensions}`;
   const filesMatched = glob.sync(pattern, {
-    cwd: srcDir
+    cwd: srcRoot
   });
   return filesMatched;
-};
-
-/**
- * 更新対象ファイルのリストを取得する
- * @param targetDir 比較、保存対象ディレクトリ
- * @param imgExtension 対象ファイル拡張子 形式はglob
- * @returns {{path: Array, fileName: Array}} 更新対象ファイルリスト pathはフルパス、filenameはsrcディレクトリからの相対パス
- */
-const getUpdateFileList = (srcDir, imgExtension) => {
-  const imageList = getImageList(srcDir, imgExtension);
-  const list = {
-    path: [],
-    fileName: []
-  };
-
-  for (let file of imageList) {
-    list.path.push(srcDir + "/" + file);
-    list.fileName.push(file);
-  }
-  return list;
 };
 
 /**
  * ディレクトリに対して更新対象ファイルの抽出、画像最適化と保存の一連の処理を実行する
  * @param targetDir 保存先ディレクトリ
  */
-const optimize = async (srcDir, targetDir) => {
+const optimize = async (srcRoot, distRoot, subDir) => {
   let extension = imgExtension;
-  const list = getUpdateFileList(srcDir, extension);
+  const list = getImageList(srcRoot, subDir, extension);
 
+  console.log(list);
   const encoders = [
     { enc: imageminMozjpeg, name: "mozJpeg" },
     { enc: imageminWebP, name: "webp" }
   ];
-  await loadFiles(list, srcDir, targetDir, encoders[0]);
-  await loadFiles(list, srcDir, targetDir, encoders[1]);
+  await loadFiles(list, srcRoot, distRoot, subDir, encoders[0]);
+  await loadFiles(list, srcRoot, distRoot, subDir, encoders[1]);
 };
 
-const loadFiles = (list, srcDir, targetDir, encoder) => {
+const loadFiles = (list, srcRoot, distRoot, subDir, encoder) => {
   return new Promise((resolve, reject) => {
     const promiseArray = [];
 
-    for (let filePath of list.fileName) {
-      const srcPath = srcDir + "/" + filePath;
-      const outputPath = targetDir + "/" + filePath;
+    for (let filePath of list) {
+      const srcPath = srcRoot + "/" + filePath;
+      const outputPath = distRoot + "/" + filePath;
 
       const data = fs.readFileSync(srcPath);
 
       if (sizeData[filePath] == null) sizeData[filePath] = {};
+      sizeData[filePath]["URL"] = filePath;
       sizeData[filePath][encoder.name] = {};
       sizeData[filePath][encoder.name]["100"] = {};
       sizeData[filePath][encoder.name]["100"].size = data.byteLength;
@@ -110,7 +92,7 @@ const onData = (data, quality, encoder, fileName, outputPath) => {
 
     imagemin.buffer(data, pluginConfig).then(buffer => {
       makeDir(outputDir + "/" + encoder.name + "/" + qualityString).then(
-        path => {
+        dirPath => {
           const size = buffer.byteLength;
           const fileJson = sizeData[fileName][encoder.name];
 
@@ -118,7 +100,7 @@ const onData = (data, quality, encoder, fileName, outputPath) => {
           dataObj.size = size;
           dataObj.rate = size / fileJson["100"].size;
 
-          let fullPath = path + "/" + fileName;
+          let fullPath = dirPath + "/" + path.basename(fileName);
           if (encoder.enc === imageminWebP) {
             fullPath = replaceExt(fullPath, ".webp");
           }
@@ -151,7 +133,7 @@ const srcDir = `${process.cwd()}/src`;
 const distDir = `${process.cwd()}/dist`;
 
 const sizeData = {};
-optimize(srcDir + "/img/jpg_photo", distDir + "/img/jpg_photo");
+optimize(srcDir, distDir, "/img/jpg_photo");
 
 process.on("exit", function() {
   console.log("exiting program...");
