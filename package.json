@@ -5,7 +5,12 @@
   "author": "Masato Makino",
   "license": "MIT",
   "devDependencies": {
+    "babel-core": "^6.26.3",
+    "babel-loader": "^7.1.5",
+    "babel-preset-env": "^1.7.0",
+    "browser-sync": "^2.24.6",
     "chart.js": "^2.7.2",
+    "compression": "^1.7.3",
     "cpx": "^1.5.0",
     "glob": "^7.1.2",
     "husky": "^1.0.0-rc.13",
@@ -21,7 +26,9 @@
     "prettier": "^1.10.2",
     "pretty-quick": "^1.6.0",
     "purecss": "^1.0.0",
-    "replace-ext": "^1.0.0"
+    "replace-ext": "^1.0.0",
+    "webpack": "^4.16.5",
+    "webpack-cli": "^3.1.0"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -29,7 +36,11 @@
     "sass:nodesass": "node-sass --importer node_modules/node-sass-package-importer/dist/cli.js -o ./dist/css src/css/main.scss",
     "sass:dev": "npm run sass:nodesass -- --output-style expanded",
     "sass:release": "npm run sass:nodesass -- --output-style compressed",
-    "copy:html": "cpx './src/**/*.html' ./dist"
+    "copy:html": "cpx './src/**/*.html' ./dist",
+    "watch:server": "node task/browsersync.js",
+    "javascript:dev": "webpack --config webpack.config.script.js --mode development",
+    "watch:javascript": "npm run javascript:dev -- --watch",
+    "javascript:production": "webpack --config webpack.config.script.js --mode production --progress --color"
   },
   "husky": {
     "hooks": {
