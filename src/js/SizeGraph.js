@@ -56,8 +56,6 @@ export default class {
     }
   }
 
-  update() {}
-
   getOption() {
     const yAxesScaleType = this.scaleCheckBox.checked
       ? "logarithmic"

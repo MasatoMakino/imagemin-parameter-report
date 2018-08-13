@@ -2,6 +2,7 @@
 
 import Chart from "chart.js";
 import SizeGraph from "./SizeGraph.js";
+import * as juxtaposejs from "juxtaposejs/build/js/juxtapose.js";
 
 const loadJson = () => {
   fetch("report.json")
