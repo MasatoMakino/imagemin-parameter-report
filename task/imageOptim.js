@@ -127,7 +127,7 @@ const onData = (data, quality, encoder, fileName, outputPath) => {
 
 const maxRate = 90;
 const minRate = 30;
-const dif = 15;
+const dif = 5;
 
 const srcDir = `${process.cwd()}/src`;
 const distDir = `${process.cwd()}/dist`;

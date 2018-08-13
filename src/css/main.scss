@@ -2,6 +2,10 @@
 @import "~purecss/build/grids-responsive-min.css";
 @import "pricing";
 
-#myChart {
+.pure-g {
   letter-spacing: 0;
+}
+
+.pure-form select {
+  margin-right: 16px;
 }
