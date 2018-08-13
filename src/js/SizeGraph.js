@@ -10,19 +10,59 @@ export default class {
   init(json) {
     this.json = json;
     const ctx = document.getElementById("myChart").getContext("2d");
+    this.initForm();
 
     this.chart = new Chart(ctx, {
       type: "scatter",
       data: {
-        datasets: this.getDataSet(json, ["mozJpeg", "webp"])
+        datasets: this.getDataSet(json)
       },
       options: this.getOption()
     });
   }
 
+  initForm() {
+    this.scaleCheckBox = document.getElementById("scale");
+    this.scaleCheckBox.addEventListener("change", e => {
+      this.onChangedScale(e);
+    });
+
+    this.encorderTypeSelecter = document.getElementById("encoder");
+    this.encorderTypeSelecter.addEventListener("change", e => {
+      this.onChangedEncoder(e);
+    });
+  }
+
+  onChangedScale(e) {
+    this.chart.options = this.getOption();
+    this.chart.update();
+  }
+
+  onChangedEncoder(e) {
+    this.chart.data.datasets = this.getDataSet(this.json);
+    this.chart.update();
+  }
+
+  getEncorderType() {
+    switch (this.encorderTypeSelecter.value) {
+      case "All":
+        return ["mozJpeg", "webp"];
+      case "mozJpeg":
+        return ["mozJpeg"];
+      case "webp":
+        return ["webp"];
+      default:
+        return ["mozJpeg", "webp"];
+    }
+  }
+
   update() {}
 
   getOption() {
+    const yAxesScaleType = this.scaleCheckBox.checked
+      ? "logarithmic"
+      : "linear";
+
     return {
       responsive: true,
       maintainAspectRatio: false,
@@ -31,8 +71,8 @@ export default class {
           {
             ticks: {
               beginAtZero: true
-            }
-            // type:"logarithmic"
+            },
+            type: yAxesScaleType
           }
         ],
         xAxes: [
@@ -46,8 +86,9 @@ export default class {
     };
   }
 
-  getDataSet(json, encoderTypes) {
+  getDataSet(json) {
     const dataSet = [];
+    const encoderTypes = this.getEncorderType();
 
     for (let key in json) {
       if (!json.hasOwnProperty(key)) continue;
