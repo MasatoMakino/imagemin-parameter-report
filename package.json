@@ -33,6 +33,7 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
+    "publish": "npm-run-all -s imageOptim sass:release copy:html javascript:production watch:server",
     "imageOptim": "node task/imageOptim.js",
     "watch": "npm-run-all -p watch:*",
     "sass:nodesass": "node-sass --importer node_modules/node-sass-package-importer/dist/cli.js -o ./dist/css src/css/main.scss",

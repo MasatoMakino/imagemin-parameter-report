@@ -102,7 +102,8 @@ export default class {
   getData(imgObj, encoderType) {
     const dataObj = {};
 
-    dataObj.label = imgObj.URL;
+    dataObj.label =
+      imgObj.URL.match(".+/(.+?).[a-z]+([?#;].*)?$")[1] + " : " + encoderType;
     dataObj.fill = false;
     dataObj.lineTension = 0;
     dataObj.showLine = true;

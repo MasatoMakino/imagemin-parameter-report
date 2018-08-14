@@ -7,9 +7,10 @@ const makeDir = require("make-dir");
 const replaceExt = require("replace-ext");
 
 const imagemin = require("imagemin");
-const imageminPngquant = require("imagemin-pngquant");
+// const imageminPngquant = require("imagemin-pngquant");
 const imageminMozjpeg = require("imagemin-mozjpeg");
 const imageminWebP = require("imagemin-webp");
+const imageminjpegoptim = require("imagemin-jpegoptim");
 
 const imgExtension = "+(jpg|jpeg|png|gif|svg)";
 
@@ -37,10 +38,12 @@ const optimize = async (srcRoot, distRoot, subDir) => {
   console.log(list);
   const encoders = [
     { enc: imageminMozjpeg, name: "mozJpeg" },
+    { enc: imageminjpegoptim, name: "jpegOptim" },
     { enc: imageminWebP, name: "webp" }
   ];
   await loadFiles(list, srcRoot, distRoot, subDir, encoders[0]);
   await loadFiles(list, srcRoot, distRoot, subDir, encoders[1]);
+  await loadFiles(list, srcRoot, distRoot, subDir, encoders[2]);
 };
 
 const loadFiles = (list, srcRoot, distRoot, subDir, encoder) => {
@@ -85,7 +88,8 @@ const onData = (data, quality, encoder, fileName, outputPath) => {
     const pluginConfig = {
       use: [
         encoder.enc({
-          quality: quality
+          quality: quality,
+          max: quality
         })
       ]
     };
@@ -125,7 +129,7 @@ const onData = (data, quality, encoder, fileName, outputPath) => {
 
 //メイン処理
 
-const maxRate = 90;
+const maxRate = 95;
 const minRate = 30;
 const dif = 5;
 
