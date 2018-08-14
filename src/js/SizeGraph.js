@@ -1,6 +1,7 @@
 "use strict";
 
 import Chart from "chart.js";
+import { updatePullDown, getEncoderList } from "./JsonController.js";
 
 export default class {
   constructor() {
@@ -10,7 +11,7 @@ export default class {
   init(json) {
     this.json = json;
     const ctx = document.getElementById("myChart").getContext("2d");
-    this.initForm();
+    this.initForm(json);
 
     this.chart = new Chart(ctx, {
       type: "scatter",
@@ -21,14 +22,19 @@ export default class {
     });
   }
 
-  initForm() {
+  initForm(json) {
     this.scaleCheckBox = document.getElementById("scale");
     this.scaleCheckBox.addEventListener("change", e => {
       this.onChangedScale(e);
     });
 
-    this.encorderTypeSelecter = document.getElementById("encoder");
-    this.encorderTypeSelecter.addEventListener("change", e => {
+    this.encoderTypeSelecter = document.getElementById("encoder");
+
+    const encodeKeys = getEncoderList(json);
+    encodeKeys.unshift("All");
+    updatePullDown("encoder", encodeKeys);
+
+    this.encoderTypeSelecter.addEventListener("change", e => {
       this.onChangedEncoder(e);
     });
   }
@@ -43,17 +49,12 @@ export default class {
     this.chart.update();
   }
 
-  getEncorderType() {
-    switch (this.encorderTypeSelecter.value) {
-      case "All":
-        return ["mozJpeg", "webp"];
-      case "mozJpeg":
-        return ["mozJpeg"];
-      case "webp":
-        return ["webp"];
-      default:
-        return ["mozJpeg", "webp"];
+  getEncoderType(json) {
+    const encodeKeys = getEncoderList(json);
+    if (this.encoderTypeSelecter.value === "All") {
+      return encodeKeys;
     }
+    return [this.encoderTypeSelecter.value];
   }
 
   getOption() {
@@ -86,7 +87,7 @@ export default class {
 
   getDataSet(json) {
     const dataSet = [];
-    const encoderTypes = this.getEncorderType();
+    const encoderTypes = this.getEncoderType(json);
 
     for (let key in json) {
       if (!json.hasOwnProperty(key)) continue;
@@ -123,13 +124,17 @@ export default class {
   }
 
   getColor(encoderType) {
-    switch (encoderType) {
-      case "mozJpeg":
-        return "rgba(255, 0, 0, 0.1)";
-      case "webp":
-        return "rgba(0, 255, 0, 0.1)";
-      default:
-        return "rgba(0, 0, 0, 0.1)";
-    }
+    const encodeKeys = getEncoderList(this.json);
+    const index = encodeKeys.indexOf(encoderType);
+
+    const colors = [
+      "rgba(255, 0, 0, 0.1)",
+      "rgba(0, 255, 0, 0.1)",
+      "rgba(0, 0, 255, 0.1)",
+      "rgba(255, 0, 255, 0.1)",
+      "rgba(0, 255, 255, 0.1)",
+      "rgba(255, 255, 0, 0.1)"
+    ];
+    return colors[index];
   }
 }
