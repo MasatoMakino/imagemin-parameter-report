@@ -61,5 +61,7 @@ typings/
 .next
 original
 src/img/**/*.jpg
+src/img/**/*.png
+src/img/**/*.svg
 .idea
 dist
