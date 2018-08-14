@@ -1,3 +1,11 @@
+"use strict";
+import {
+  getKeys,
+  updatePullDown,
+  getEncoderList,
+  getQualityList
+} from "./JsonController.js";
+
 export default class {
   constructor() {
     this.json = {};
@@ -5,71 +13,39 @@ export default class {
 
   init(json) {
     this.json = json;
-
     this.initSrcPullDown(json);
     this.initEncoderPullDown(json);
     this.initQualityPullDown(json);
-
     this.updateImage();
   }
 
   initSrcPullDown(json) {
-    let keys = this.getKeys(json);
-    this.updatePullDown("srcImg", keys);
+    let keys = getKeys(json);
+    updatePullDown("srcImg", keys);
+    this.initPullDownEventListener("srcImg");
   }
 
   initEncoderPullDown(json) {
-    let keys = this.getKeys(json);
-    const lastPhoto = json[keys[keys.length - 1]];
-
-    keys = this.getKeys(lastPhoto, "object");
-    this.updatePullDown("leftEncoder", keys);
-    this.updatePullDown("rightEncoder", keys);
+    let keys = getEncoderList(json);
+    updatePullDown("leftEncoder", keys);
+    updatePullDown("rightEncoder", keys);
+    this.initPullDownEventListener("leftEncoder");
+    this.initPullDownEventListener("rightEncoder");
   }
 
   initQualityPullDown(json) {
-    let keys = this.getKeys(json);
-    const lastPhoto = json[keys[keys.length - 1]];
-
-    keys = this.getKeys(lastPhoto, "object");
-    const lastEncoder = lastPhoto[keys[keys.length - 1]];
-
-    keys = this.getKeys(lastEncoder, "object");
-    keys.sort(function(a, b) {
-      let aNum = parseInt(a);
-      let bNum = parseInt(b);
-      if (aNum > bNum) return -1;
-      if (aNum < bNum) return 1;
-      return 0;
-    });
-    if (keys[0] === "100") {
-      keys.shift();
-    }
-    this.updatePullDown("leftQuality", keys);
-    this.updatePullDown("rightQuality", keys);
+    let keys = getQualityList(json);
+    updatePullDown("leftQuality", keys);
+    updatePullDown("rightQuality", keys);
+    this.initPullDownEventListener("leftQuality");
+    this.initPullDownEventListener("rightQuality");
   }
 
-  getKeys(jsonObj, typeFilter) {
-    let keys = [];
-    for (let key in jsonObj) {
-      if (!jsonObj.hasOwnProperty(key)) continue;
-      if (typeFilter != null && typeFilter !== typeof jsonObj[key]) continue;
-      keys.push(key);
-    }
-    return keys;
-  }
-
-  generateListFromKeys(keys) {
-    let html = "";
-    for (let key of keys) {
-      html += `<option>${key}</option>`;
-    }
-    return html;
-  }
-
-  updatePullDown(id, keys) {
+  initPullDownEventListener(id) {
     const pullDown = document.getElementById(id);
-    pullDown.innerHTML = this.generateListFromKeys(keys);
+    pullDown.addEventListener("change", e => {
+      this.updateImage();
+    });
   }
 
   updateImage() {
@@ -78,6 +54,12 @@ export default class {
 
     left.src = this.getImageURL("left");
     right.src = this.getImageURL("right");
+
+    let leftSize = document.getElementById("leftSize");
+    let rightSize = document.getElementById("rightSize");
+
+    leftSize.innerText = `size : ${this.getImageKB("left")}KB`;
+    rightSize.innerText = `size : ${this.getImageKB("right")}KB`;
   }
 
   /**
@@ -98,7 +80,6 @@ export default class {
     }
 
     const url = `${dir}/${encoder}/${quality}${fileName}`;
-    console.log(url);
     return url;
   }
 
@@ -115,5 +96,15 @@ export default class {
   getEncoder(side) {
     const pullDown = document.getElementById(side + "Encoder");
     return pullDown.value;
+  }
+
+  getImageSize(side) {
+    return this.json[this.getOriginalURL()][this.getEncoder(side)][
+      this.getQuality(side)
+    ].size;
+  }
+
+  getImageKB(side) {
+    return (this.getImageSize(side) / 1024).toFixed(1);
   }
 }
