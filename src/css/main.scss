@@ -6,7 +6,7 @@
   letter-spacing: 0;
 }
 
-.pure-form select {
+.pure-form select:not(:last-child) {
   margin-right: 16px;
 }
 

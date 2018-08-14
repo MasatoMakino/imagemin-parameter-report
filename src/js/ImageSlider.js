@@ -11,5 +11,21 @@ export default class {
 
     left.src = "img/jpg_photo/mozJpeg/30/l0134.jpg";
     right.src = "img/jpg_photo/mozJpeg/90/l0134.jpg";
+
+    this.initSrcPullDown(json);
+  }
+
+  initSrcPullDown(json) {
+    let keys = this.getKeys(json);
+    console.log(keys);
+  }
+
+  getKeys(jsonObj) {
+    let keys = [];
+    for (let key in jsonObj) {
+      if (!jsonObj.hasOwnProperty(key)) continue;
+      keys.push(key);
+    }
+    return keys;
   }
 }
