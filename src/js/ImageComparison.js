@@ -3,7 +3,8 @@ import {
   getKeys,
   updatePullDown,
   getEncoderList,
-  getQualityList
+  getQualityList,
+  generateImageURL
 } from "./JsonController.js";
 
 export default class {
@@ -72,15 +73,7 @@ export default class {
     const quality = this.getQuality(side);
     const encoder = this.getEncoder(side);
 
-    const index = originalURL.lastIndexOf("/");
-    const dir = originalURL.substring(0, index);
-    let fileName = originalURL.substring(index);
-    if (encoder === "webp") {
-      fileName = fileName.replace(/\.[^.]*$/, ".webp");
-    }
-
-    const url = `${dir}/${encoder}/${quality}${fileName}`;
-    return url;
+    return generateImageURL(originalURL, encoder, quality);
   }
 
   getOriginalURL() {

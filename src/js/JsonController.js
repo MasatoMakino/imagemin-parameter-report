@@ -23,6 +23,11 @@ function generateListFromKeys(keys) {
   return html;
 }
 
+export function getImageList(json) {
+  let keys = getKeys(json);
+  return keys;
+}
+
 export function getEncoderList(json) {
   let keys = getKeys(json);
   const lastPhoto = json[keys[keys.length - 1]];
@@ -48,4 +53,14 @@ export function getQualityList(json) {
     keys.shift();
   }
   return keys;
+}
+
+export function generateImageURL(originalURL, encoder, quality) {
+  const index = originalURL.lastIndexOf("/");
+  const dir = originalURL.substring(0, index);
+  let fileName = originalURL.substring(index);
+  if (encoder === "webp") {
+    fileName = fileName.replace(/\.[^.]*$/, ".webp");
+  }
+  return `${dir}/${encoder}/${quality}${fileName}`;
 }

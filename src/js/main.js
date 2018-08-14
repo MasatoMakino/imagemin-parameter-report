@@ -1,7 +1,8 @@
 "use strict";
 
-import SizeGraph from "./SizeGraph.js";
-import ImageSlider from "./ImageSlider.js";
+import SizeChart from "./SizeChart.js";
+import ImageComparison from "./ImageComparison.js";
+import HeaderController from "./HeaderController";
 
 const loadJson = () => {
   fetch("report.json")
@@ -16,10 +17,12 @@ const loadJson = () => {
 let sizeJson = {};
 const onJson = json => {
   sizeJson = json;
-  let graph = new SizeGraph();
+  let graph = new SizeChart();
   graph.init(json);
-  let imageSlider = new ImageSlider();
-  imageSlider.init(json);
+  let imageComparison = new ImageComparison();
+  imageComparison.init(json);
+
+  let headerController = new HeaderController(json);
 };
 
 loadJson();
