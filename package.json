@@ -41,7 +41,7 @@
     "sass:dev": "npm run sass:nodesass -- --output-style expanded",
     "sass:release": "npm run sass:nodesass -- --output-style compressed",
     "watch:sass": "npm run sass:dev -- -w",
-    "copy:html": "cpx './src/**/*.html' ./dist",
+    "copy:html": "cpx ./src/**/*.html ./dist",
     "watch:html": "npm run copy:html -- -w",
     "watch:server": "node task/browsersync.js",
     "server": "http-server ./dist/ -o",
