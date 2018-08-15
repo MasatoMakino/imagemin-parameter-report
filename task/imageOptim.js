@@ -51,8 +51,8 @@ const loadFiles = (list, srcRoot, distRoot, subDir, encoder) => {
     const promiseArray = [];
 
     for (let filePath of list) {
-      const srcPath = srcRoot + "/" + filePath;
-      const outputPath = distRoot + "/" + filePath;
+      const srcPath = path.join(srcRoot, filePath);
+      const outputPath = path.join(distRoot, filePath);
 
       const data = fs.readFileSync(srcPath);
 
@@ -104,7 +104,7 @@ const onData = (data, quality, encoder, fileName, outputPath) => {
           dataObj.size = size;
           dataObj.rate = size / fileJson["100"].size;
 
-          let fullPath = dirPath + "/" + path.basename(fileName);
+          let fullPath = path.join(dirPath, path.basename(fileName));
           if (encoder.enc === imageminWebP) {
             fullPath = replaceExt(fullPath, ".webp");
           }

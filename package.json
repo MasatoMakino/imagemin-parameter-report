@@ -13,6 +13,7 @@
     "compression": "^1.7.3",
     "cpx": "^1.5.0",
     "glob": "^7.1.2",
+    "http-server": "^0.11.1",
     "husky": "^1.0.0-rc.13",
     "imagemin": "^6.0.0",
     "imagemin-jpegoptim": "^5.2.0",
@@ -33,7 +34,7 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "publish": "npm-run-all -s imageOptim sass:release copy:html javascript:production watch:server",
+    "publish": "npm-run-all -s imageOptim sass:release copy:html javascript:production server",
     "imageOptim": "node task/imageOptim.js",
     "watch": "npm-run-all -p watch:*",
     "sass:nodesass": "node-sass --importer node_modules/node-sass-package-importer/dist/cli.js -o ./dist/css src/css/main.scss",
@@ -43,6 +44,7 @@
     "copy:html": "cpx './src/**/*.html' ./dist",
     "watch:html": "npm run copy:html -- -w",
     "watch:server": "node task/browsersync.js",
+    "server": "http-server ./dist/ -o",
     "javascript:dev": "webpack --config webpack.config.script.js --mode development",
     "watch:javascript": "npm run javascript:dev -- --watch",
     "javascript:production": "webpack --config webpack.config.script.js --mode production --progress --color"
