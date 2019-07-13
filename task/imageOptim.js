@@ -86,9 +86,9 @@ const onData = (data, quality, encoder, fileName, outputPath) => {
     const qualityString = quality.toString();
 
     const pluginConfig = {
-      use: [
+      plugins: [
         encoder.enc({
-          quality: quality,
+          quality: [quality],
           max: quality
         })
       ]
@@ -141,9 +141,8 @@ optimize(srcDir, distDir, "/img/jpg_photo");
 
 process.on("exit", function() {
   console.log("exiting program...");
-  console.log(sizeData);
-  fs.writeFileSync(
-    distDir + "/report.json",
-    JSON.stringify(sizeData, null, "    ")
-  );
+
+  const sizeDataString = JSON.stringify(sizeData, null, "    ");
+  console.log(sizeDataString);
+  fs.writeFileSync(distDir + "/report.json", JSON.stringify(sizeDataString));
 });
