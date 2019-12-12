@@ -18,7 +18,6 @@ export default class {
     const encoder = getEncoderList(json)[0];
     let qualityList = getQualityList(json);
     let quality = qualityList[0];
-    console.log(qualityList);
     if (qualityList.indexOf("75") !== -1) {
       quality = "75";
     }
