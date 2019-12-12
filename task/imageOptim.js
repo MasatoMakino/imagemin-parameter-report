@@ -7,7 +7,6 @@ const makeDir = require("make-dir");
 const replaceExt = require("replace-ext");
 
 const imagemin = require("imagemin");
-// const imageminPngquant = require("imagemin-pngquant");
 const imageminMozjpeg = require("imagemin-mozjpeg");
 const imageminWebP = require("imagemin-webp");
 const imageminjpegoptim = require("imagemin-jpegoptim");
@@ -143,6 +142,5 @@ process.on("exit", function() {
   console.log("exiting program...");
 
   const sizeDataString = JSON.stringify(sizeData, null, "    ");
-  console.log(sizeDataString);
-  fs.writeFileSync(distDir + "/report.json", JSON.stringify(sizeDataString));
+  fs.writeFileSync(distDir + "/report.json", sizeDataString, "utf8");
 });
