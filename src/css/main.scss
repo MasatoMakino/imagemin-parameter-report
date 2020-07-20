@@ -6,6 +6,9 @@
   letter-spacing: 0;
 }
 
+.pure-form select {
+  padding: 0 0.6rem;
+}
 .pure-form select:not(:last-child) {
   margin-right: 16px;
 }
