@@ -1,6 +1,6 @@
 {
   "name": "imagemin-parameter-report",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "main": "index.js",
   "author": "Masato Makino",
   "license": "MIT",
