@@ -1,6 +1,6 @@
-@import "pure-min";
-@import "grids-responsive-min";
-@import "pricing";
+@use "pure-min";
+@use "grids-responsive-min";
+@use "pricing";
 
 .pure-g {
   letter-spacing: 0;
