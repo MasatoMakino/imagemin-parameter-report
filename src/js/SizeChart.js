@@ -1,16 +1,36 @@
 "use strict";
 
-import { Chart, registerables } from "chart.js";
+import {
+  Chart,
+  Legend,
+  LinearScale,
+  LineElement,
+  LogarithmicScale,
+  PointElement,
+  ScatterController,
+  SubTitle,
+  Title,
+  Tooltip
+} from "chart.js";
 import { getEncoderList, updatePullDown } from "./JsonController.js";
 
 export default class {
   constructor() {
+    Chart.register(
+      LineElement,
+      PointElement,
+      ScatterController,
+      LinearScale,
+      LogarithmicScale,
+      Legend,
+      Title,
+      Tooltip,
+      SubTitle
+    );
     this.json = {};
   }
 
   init(json) {
-    Chart.register(...registerables);
-
     this.json = json;
     const ctx = document.getElementById("myChart").getContext("2d");
     this.initForm(json);
@@ -79,22 +99,23 @@ export default class {
           reverse: true,
         },
       },
-      plugins:{
-        tooltip:{
-          callbacks:{
-            label:function(context){
-              let label = context.dataset.label+ " - "+ context.parsed.y.toFixed(3) || '';
+      plugins: {
+        tooltip: {
+          callbacks: {
+            label: function (context) {
+              let label =
+                context.dataset.label + " - " + context.parsed.y.toFixed(3) ||
+                "";
               return label;
             },
-            labelColor:function(tooltipItem) {
-              return{
-                backgroundColor:tooltipItem.dataset.labelColor,
-              }
-            }
-          }
-        }
-      }
-
+            labelColor: function (tooltipItem) {
+              return {
+                backgroundColor: tooltipItem.dataset.labelColor,
+              };
+            },
+          },
+        },
+      },
     };
   }
 
@@ -152,9 +173,11 @@ export default class {
     ];
     return colors[index];
   }
-  getLabelColor(encoderType, alpha){
+  getLabelColor(encoderType, alpha) {
     const color = this.getColor(encoderType);
-    return color.replace(/rgba\(([0-9.]+),\s*([0-9.]+),\s*([0-9.]+),\s*[0-9.]+\)/g, "rgba($1,$2,$3,"+alpha+")")
+    return color.replace(
+      /rgba\(([0-9.]+),\s*([0-9.]+),\s*([0-9.]+),\s*[0-9.]+\)/g,
+      "rgba($1,$2,$3," + alpha + ")"
+    );
   }
-
 }
