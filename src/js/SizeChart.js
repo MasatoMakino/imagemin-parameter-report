@@ -1,10 +1,32 @@
 "use strict";
 
-import { Chart } from "chart.js";
+import {
+  Chart,
+  Legend,
+  LinearScale,
+  LineElement,
+  LogarithmicScale,
+  PointElement,
+  ScatterController,
+  SubTitle,
+  Title,
+  Tooltip
+} from "chart.js";
 import { getEncoderList, updatePullDown } from "./JsonController.js";
 
 export default class {
   constructor() {
+    Chart.register(
+      LineElement,
+      PointElement,
+      ScatterController,
+      LinearScale,
+      LogarithmicScale,
+      Legend,
+      Title,
+      Tooltip,
+      SubTitle
+    );
     this.json = {};
   }
 
@@ -13,13 +35,15 @@ export default class {
     const ctx = document.getElementById("myChart").getContext("2d");
     this.initForm(json);
 
-    this.chart = new Chart(ctx, {
+    const config = {
       type: "scatter",
       data: {
         datasets: this.getDataSet(json),
       },
       options: this.getOption(),
-    });
+    };
+
+    this.chart = new Chart(ctx, config);
   }
 
   initForm(json) {
@@ -66,21 +90,31 @@ export default class {
       responsive: true,
       maintainAspectRatio: false,
       scales: {
-        yAxes: [
-          {
-            ticks: {
-              beginAtZero: true,
+        y: {
+          beginAtZero: true,
+          type: yAxesScaleType,
+          position: "left",
+        },
+        x: {
+          reverse: true,
+        },
+      },
+      plugins: {
+        tooltip: {
+          callbacks: {
+            label: function (context) {
+              let label =
+                context.dataset.label + " - " + context.parsed.y.toFixed(3) ||
+                "";
+              return label;
             },
-            type: yAxesScaleType,
-          },
-        ],
-        xAxes: [
-          {
-            ticks: {
-              reverse: true,
+            labelColor: function (tooltipItem) {
+              return {
+                backgroundColor: tooltipItem.dataset.labelColor,
+              };
             },
           },
-        ],
+        },
       },
     };
   }
@@ -108,6 +142,7 @@ export default class {
     dataObj.lineTension = 0;
     dataObj.showLine = true;
     dataObj.borderColor = this.getColor(encoderType);
+    dataObj.labelColor = this.getLabelColor(encoderType, 0.5);
     dataObj.data = [];
 
     const encoderObj = imgObj[encoderType];
@@ -137,5 +172,12 @@ export default class {
       "rgba(255, 255, 0, 0.1)",
     ];
     return colors[index];
+  }
+  getLabelColor(encoderType, alpha) {
+    const color = this.getColor(encoderType);
+    return color.replace(
+      /rgba\(([0-9.]+),\s*([0-9.]+),\s*([0-9.]+),\s*[0-9.]+\)/g,
+      "rgba($1,$2,$3," + alpha + ")"
+    );
   }
 }
