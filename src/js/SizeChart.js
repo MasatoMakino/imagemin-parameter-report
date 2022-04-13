@@ -1,7 +1,7 @@
 "use strict";
 
-import Chart from "chart.js";
-import { updatePullDown, getEncoderList } from "./JsonController.js";
+import { Chart } from "chart.js";
+import { getEncoderList, updatePullDown } from "./JsonController.js";
 
 export default class {
   constructor() {
@@ -16,15 +16,15 @@ export default class {
     this.chart = new Chart(ctx, {
       type: "scatter",
       data: {
-        datasets: this.getDataSet(json)
+        datasets: this.getDataSet(json),
       },
-      options: this.getOption()
+      options: this.getOption(),
     });
   }
 
   initForm(json) {
     this.scaleCheckBox = document.getElementById("scale");
-    this.scaleCheckBox.addEventListener("change", e => {
+    this.scaleCheckBox.addEventListener("change", (e) => {
       this.onChangedScale(e);
     });
 
@@ -34,7 +34,7 @@ export default class {
     encodeKeys.unshift("All");
     updatePullDown("encoder", encodeKeys);
 
-    this.encoderTypeSelecter.addEventListener("change", e => {
+    this.encoderTypeSelecter.addEventListener("change", (e) => {
       this.onChangedEncoder(e);
     });
   }
@@ -69,19 +69,19 @@ export default class {
         yAxes: [
           {
             ticks: {
-              beginAtZero: true
+              beginAtZero: true,
             },
-            type: yAxesScaleType
-          }
+            type: yAxesScaleType,
+          },
         ],
         xAxes: [
           {
             ticks: {
-              reverse: true
-            }
-          }
-        ]
-      }
+              reverse: true,
+            },
+          },
+        ],
+      },
     };
   }
 
@@ -134,7 +134,7 @@ export default class {
       "rgba(0, 0, 255, 0.1)",
       "rgba(255, 0, 255, 0.1)",
       "rgba(0, 255, 255, 0.1)",
-      "rgba(255, 255, 0, 0.1)"
+      "rgba(255, 255, 0, 0.1)",
     ];
     return colors[index];
   }
