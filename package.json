@@ -48,10 +48,5 @@
     "javascript:dev": "webpack --config webpack.config.script.js --mode development",
     "watch:javascript": "npm run javascript:dev -- --watch",
     "javascript:production": "webpack --config webpack.config.script.js --mode production --progress --color"
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "pretty-quick --staged"
-    }
   }
 }
