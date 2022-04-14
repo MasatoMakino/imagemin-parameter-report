@@ -1,5 +1,6 @@
 "use strict";
-const webpack = require("webpack");
+const CopyPlugin = require("copy-webpack-plugin");
+const path = require("path");
 
 module.exports = (env, argv) => {
   const config = {
@@ -24,7 +25,17 @@ module.exports = (env, argv) => {
         },
       ],
     },
-    plugins: [new webpack.ProvidePlugin({})],
+    plugins: [
+      new CopyPlugin({
+        patterns: [
+          {
+            from: "**/*.html",
+            to: path.resolve(__dirname, "dist"),
+            context: "./src",
+          },
+        ],
+      }),
+    ],
   };
   return config;
 };
