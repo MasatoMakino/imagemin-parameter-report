@@ -14,6 +14,13 @@ module.exports = (env, argv) => {
     resolve: {
       extensions: [".js", ".webpack.js", ".web.js", ".js"],
     },
+    devServer: {
+      static: "./dist",
+      open: true,
+      devMiddleware: {
+        writeToDisk: true,
+      },
+    },
     module: {
       rules: [
         {
