@@ -1,15 +1,15 @@
 "use strict";
 
-const fs = require("fs");
-const path = require("path");
-const glob = require("glob");
-const makeDir = require("make-dir");
-const replaceExt = require("replace-ext");
+import imagemin from "imagemin";
+import imageminMozjpeg from "imagemin-mozjpeg";
+import imageminWebP from "imagemin-webp";
+import imageminjpegoptim from "imagemin-jpegoptim";
 
-const imagemin = require("imagemin");
-const imageminMozjpeg = require("imagemin-mozjpeg");
-const imageminWebP = require("imagemin-webp");
-const imageminjpegoptim = require("imagemin-jpegoptim");
+import fs from "fs";
+import path from "path";
+import glob from "glob";
+import makeDir from "make-dir";
+import replaceExt from "replace-ext";
 
 const imgExtension = "+(jpg|jpeg|png|gif|svg)";
 
@@ -21,7 +21,7 @@ const imgExtension = "+(jpg|jpeg|png|gif|svg)";
 const getImageList = (srcRoot, subDir, extensions) => {
   const pattern = `**/*.${extensions}`;
   const filesMatched = glob.sync(pattern, {
-    cwd: srcRoot
+    cwd: srcRoot,
   });
   return filesMatched;
 };
@@ -38,7 +38,7 @@ const optimize = async (srcRoot, distRoot, subDir) => {
   const encoders = [
     { enc: imageminMozjpeg, name: "mozJpeg" },
     { enc: imageminjpegoptim, name: "jpegOptim" },
-    { enc: imageminWebP, name: "webp" }
+    { enc: imageminWebP, name: "webp" },
   ];
   await loadFiles(list, srcRoot, distRoot, subDir, encoders[0]);
   await loadFiles(list, srcRoot, distRoot, subDir, encoders[1]);
@@ -88,14 +88,14 @@ const onData = (data, quality, encoder, fileName, outputPath) => {
       plugins: [
         encoder.enc({
           quality: [quality],
-          max: quality
-        })
-      ]
+          max: quality,
+        }),
+      ],
     };
 
-    imagemin.buffer(data, pluginConfig).then(buffer => {
+    imagemin.buffer(data, pluginConfig).then((buffer) => {
       makeDir(outputDir + "/" + encoder.name + "/" + qualityString).then(
-        dirPath => {
+        (dirPath) => {
           const size = buffer.byteLength;
           const fileJson = sizeData[fileName][encoder.name];
 
@@ -108,7 +108,7 @@ const onData = (data, quality, encoder, fileName, outputPath) => {
             fullPath = replaceExt(fullPath, ".webp");
           }
 
-          fs.writeFile(fullPath, buffer, err => {
+          fs.writeFile(fullPath, buffer, (err) => {
             // 書き出しに失敗した場合
             if (err) {
               console.log("エラーが発生しました。" + err);
@@ -138,7 +138,7 @@ const distDir = `${process.cwd()}/dist`;
 const sizeData = {};
 optimize(srcDir, distDir, "/img/jpg_photo");
 
-process.on("exit", function() {
+process.on("exit", function () {
   console.log("exiting program...");
 
   const sizeDataString = JSON.stringify(sizeData, null, "    ");
