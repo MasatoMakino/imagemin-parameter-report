@@ -1,15 +1,10 @@
 "use strict";
 
-import imagemin from "imagemin";
-import imageminMozjpeg from "imagemin-mozjpeg";
-import imageminWebP from "imagemin-webp";
-import imageminjpegoptim from "imagemin-jpegoptim";
-
 import fs from "fs";
 import path from "path";
 import glob from "glob";
-import makeDir from "make-dir";
 import replaceExt from "replace-ext";
+import sharp from "sharp";
 
 const imgExtension = "+(jpg|jpeg|png|gif|svg)";
 
@@ -35,11 +30,7 @@ const optimize = async (srcRoot, distRoot, subDir) => {
   const list = getImageList(srcRoot, subDir, extension);
 
   console.log(list);
-  const encoders = [
-    { enc: imageminMozjpeg, name: "mozJpeg" },
-    { enc: imageminjpegoptim, name: "jpegOptim" },
-    { enc: imageminWebP, name: "webp" },
-  ];
+  const encoders = [{ name: "mozJpeg" }, { name: "jpeg" }, { name: "webp" }];
   await loadFiles(list, srcRoot, distRoot, subDir, encoders[0]);
   await loadFiles(list, srcRoot, distRoot, subDir, encoders[1]);
   await loadFiles(list, srcRoot, distRoot, subDir, encoders[2]);
@@ -75,54 +66,36 @@ const loadFiles = (list, srcRoot, distRoot, subDir, encoder) => {
 
 /**
  * ファイルが読み込まれた後の処理。最適化を行う。
- * @param data
- * @param outputDir
+ * @param data buffer array
+ * @param quality
+ * @param encoder
+ * @param fileName
  * @param outputPath
+ * @return {Promise<null>}
  */
-const onData = (data, quality, encoder, fileName, outputPath) => {
-  return new Promise((resolve, reject) => {
-    const outputDir = path.dirname(outputPath);
-    const qualityString = quality.toString();
+const onData = async (data, quality, encoder, fileName, outputPath) => {
+  const outputDir = path.dirname(outputPath);
+  const qualityString = quality.toString();
 
-    const pluginConfig = {
-      plugins: [
-        encoder.enc({
-          quality: [quality],
-          max: quality,
-        }),
-      ],
-    };
+  const dir = outputDir + "/" + encoder.name + "/" + qualityString;
+  await fs.promises.mkdir(dir, { recursive: true });
 
-    imagemin.buffer(data, pluginConfig).then((buffer) => {
-      makeDir(outputDir + "/" + encoder.name + "/" + qualityString).then(
-        (dirPath) => {
-          const size = buffer.byteLength;
-          const fileJson = sizeData[fileName][encoder.name];
-
-          const dataObj = (fileJson[qualityString] = {});
-          dataObj.size = size;
-          dataObj.rate = size / fileJson["100"].size;
-
-          let fullPath = path.join(dirPath, path.basename(fileName));
-          if (encoder.enc === imageminWebP) {
-            fullPath = replaceExt(fullPath, ".webp");
-          }
-
-          fs.writeFile(fullPath, buffer, (err) => {
-            // 書き出しに失敗した場合
-            if (err) {
-              console.log("エラーが発生しました。" + err);
-              throw err;
-            }
-            // 書き出しに成功した場合
-            else {
-              console.log(fullPath, quality);
-              resolve();
-            }
-          });
-        }
-      );
-    });
+  const sharpObj = await sharp(data);
+  if (encoder.name === "webp") {
+    await sharpObj.webp({ quality });
+  } else {
+    await sharpObj.jpeg({ quality, mozjpeg: encoder.name === "mozJpeg" });
+  }
+  let fullPath = path.join(dir, path.basename(fileName));
+  if (encoder.name === "webp") {
+    fullPath = replaceExt(fullPath, ".webp");
+  }
+  sharpObj.toFile(fullPath).then((resolve) => {
+    const fileJson = sizeData[fileName][encoder.name];
+    const dataObj = (fileJson[qualityString] = {});
+    dataObj.size = resolve.size;
+    dataObj.rate = resolve.size / fileJson["100"].size;
+    console.log(fullPath, quality);
   });
 };
 
