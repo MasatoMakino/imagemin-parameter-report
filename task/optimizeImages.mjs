@@ -1,7 +1,8 @@
 "use strict";
 
 import fs from "fs";
-import path from "path";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 import glob from "glob";
 import replaceExt from "replace-ext";
 import sharp from "sharp";
@@ -36,6 +37,17 @@ const optimize = async (srcRoot, distRoot, subDir) => {
   await loadFiles(list, srcRoot, distRoot, subDir, encoders[2]);
 };
 
+/**
+ * 指定されたファイルリストを読み込み、エンコーダを適用し、その結果を出力パスに保存します。
+ * 各ファイルのサイズデータも収集し、それを`sizeData`オブジェクトに保存します。
+ *
+ * @param {Array} list - 処理するファイルのリスト
+ * @param {string} srcRoot - 入力ファイルのルートディレクトリ
+ * @param {string} distRoot - 出力ファイルのルートディレクトリ
+ * @param {string} subDir - サブディレクトリ（現在は使用されていません）
+ * @param {Object} encoder - 使用するエンコーダ
+ * @returns {Promise} - 全てのエンコードが完了したら解決するPromise
+ */
 const loadFiles = (list, srcRoot, distRoot, subDir, encoder) => {
   return new Promise((resolve, reject) => {
     const promiseArray = [];
@@ -54,7 +66,9 @@ const loadFiles = (list, srcRoot, distRoot, subDir, encoder) => {
       sizeData[filePath][encoder.name]["100"].rate = 1.0;
 
       for (let i = minRate; i <= maxRate; i += dif) {
-        promiseArray.push(onData(data, i, encoder, filePath, outputPath));
+        promiseArray.push(
+          optimizeAndSaveFile(data, i, encoder, filePath, outputPath)
+        );
       }
     }
 
@@ -65,15 +79,24 @@ const loadFiles = (list, srcRoot, distRoot, subDir, encoder) => {
 };
 
 /**
- * ファイルが読み込まれた後の処理。最適化を行う。
- * @param data buffer array
- * @param quality
- * @param encoder
- * @param fileName
- * @param outputPath
- * @return {Promise<null>}
+ * 読み込まれたファイルデータに対して最適化を行い、その結果を保存します。
+ * エンコードは指定された品質とエンコーダを使用して行われます。
+ * エンコードされたファイルのサイズデータも収集し、それを`sizeData`オブジェクトに保存します。
+ *
+ * @param {Buffer} data - ファイルデータ
+ * @param {number} quality - エンコードの品質
+ * @param {Object} encoder - 使用するエンコーダ
+ * @param {string} fileName - ファイル名
+ * @param {string} outputPath - 出力パス
+ * @returns {Promise<null>} - エンコードとデータ保存が完了したら解決するPromise
  */
-const onData = async (data, quality, encoder, fileName, outputPath) => {
+const optimizeAndSaveFile = async (
+  data,
+  quality,
+  encoder,
+  fileName,
+  outputPath
+) => {
   const outputDir = path.dirname(outputPath);
   const qualityString = quality.toString();
 
@@ -89,6 +112,8 @@ const onData = async (data, quality, encoder, fileName, outputPath) => {
   let fullPath = path.join(dir, path.basename(fileName));
   if (encoder.name === "webp") {
     fullPath = replaceExt(fullPath, ".webp");
+  } else if (encoder.name === "jpeg" || encoder.name === "mozJpeg") {
+    fullPath = replaceExt(fullPath, ".jpg");
   }
   sharpObj.toFile(fullPath).then((resolve) => {
     const fileJson = sizeData[fileName][encoder.name];
@@ -105,8 +130,14 @@ const maxRate = 95;
 const minRate = 30;
 const dif = 5;
 
-const srcDir = `${process.cwd()}/src`;
-const distDir = `${process.cwd()}/dist`;
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const projectRoot = path.resolve(__dirname, "..");
+
+const srcDir = `${projectRoot}/src`;
+const distDir = `${projectRoot}/dist`;
+
+console.log(srcDir, distDir);
 
 const sizeData = {};
 optimize(srcDir, distDir, "/img/jpg_photo");

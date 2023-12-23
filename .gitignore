@@ -60,8 +60,7 @@ typings/
 # next.js build output
 .next
 original
-src/img/**/*.jpg
-src/img/**/*.png
+src/img/jpg_photo/**/*.jpg
 src/img/**/*.svg
 .idea
 dist

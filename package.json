@@ -26,9 +26,9 @@
     "webpack-dev-server": "^4.8.1"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "node --test",
     "publish": "npm-run-all -s imageOptim sass:release javascript:production server",
-    "imageOptim": "node task/imageOptim.mjs",
+    "imageOptim": "node task/optimizeImages.mjs",
     "watch": "npm-run-all -p watch:* start",
     "sass:nodesass": "sass --load-path node_modules/purecss/build src/css/main.scss ./dist/css/main.css",
     "sass:dev": "npm run sass:nodesass -- --style expanded",
