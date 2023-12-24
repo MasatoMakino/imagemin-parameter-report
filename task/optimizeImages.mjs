@@ -4,7 +4,6 @@ import fs from "fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import glob from "glob";
-import replaceExt from "replace-ext";
 import sharp from "sharp";
 
 const imgExtension = "+(jpg|jpeg|png|gif|svg)";
@@ -109,12 +108,9 @@ const optimizeAndSaveFile = async (
   } else {
     await sharpObj.jpeg({ quality, mozjpeg: encoder.name === "mozJpeg" });
   }
-  let fullPath = path.join(dir, path.basename(fileName));
-  if (encoder.name === "webp") {
-    fullPath = replaceExt(fullPath, ".webp");
-  } else if (encoder.name === "jpeg" || encoder.name === "mozJpeg") {
-    fullPath = replaceExt(fullPath, ".jpg");
-  }
+
+  const fullPath = replaceExtension(dir, fileName, encoder);
+
   sharpObj.toFile(fullPath).then((resolve) => {
     const fileJson = sizeData[fileName][encoder.name];
     const dataObj = (fileJson[qualityString] = {});
@@ -122,6 +118,19 @@ const optimizeAndSaveFile = async (
     dataObj.rate = resolve.size / fileJson["100"].size;
     console.log(fullPath, quality);
   });
+};
+
+const replaceExtension = (dir, fileName, encoder) => {
+  const basePath = path.join(
+    dir,
+    path.basename(fileName, path.extname(fileName))
+  );
+  if (encoder.name === "webp") {
+    return basePath + ".webp";
+  } else if (encoder.name === "jpeg" || encoder.name === "mozJpeg") {
+    return basePath + ".jpg";
+  }
+  return path.join(dir, fileName);
 };
 
 //メイン処理
