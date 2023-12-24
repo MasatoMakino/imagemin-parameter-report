@@ -49,13 +49,7 @@ Copy the files in this repository to your PC.
 In the unzipped directory, run this command.
 
 ```shell
-npm install
-```
-
-or
-
-```shell
-yarn
+npm ci
 ```
 
 ### Copy images
