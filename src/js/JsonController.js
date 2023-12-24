@@ -42,7 +42,7 @@ export function getQualityList(json) {
   const lastEncoder = lastPhoto[keys[keys.length - 1]];
 
   keys = getKeys(lastEncoder, "object");
-  keys.sort(function(a, b) {
+  keys.sort(function (a, b) {
     let aNum = parseInt(a);
     let bNum = parseInt(b);
     if (aNum > bNum) return -1;
@@ -61,6 +61,8 @@ export function generateImageURL(originalURL, encoder, quality) {
   let fileName = originalURL.substring(index);
   if (encoder === "webp") {
     fileName = fileName.replace(/\.[^.]*$/, ".webp");
+  } else if (encoder === "jpeg" || encoder === "mozJpeg") {
+    fileName = fileName.replace(/\.[^.]*$/, ".jpg");
   }
   return `${dir}/${encoder}/${quality}${fileName}`;
 }
