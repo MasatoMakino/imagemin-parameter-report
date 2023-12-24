@@ -11,10 +11,11 @@ const imgExtension = "+(jpg|jpeg|png|gif|svg)";
 
 /**
  * 対象ファイルリストを取得する
- * @param extensions
- * @returns {*}
+ * @param {string} srcRoot - 画像ファイルを検索するディレクトリのパス。
+ * @param {string} extensions - 画像ファイル拡張子。glob形式で複数を指定する。
+ * @returns {string[]} 画像ファイルのパスの配列。
  */
-const getImageList = (srcRoot, subDir, extensions) => {
+const getImageList = (srcRoot, extensions) => {
   const pattern = `**/*.${extensions}`;
   const filesMatched = glob.sync(pattern, {
     cwd: srcRoot,
@@ -26,15 +27,14 @@ const getImageList = (srcRoot, subDir, extensions) => {
  * ディレクトリに対して更新対象ファイルの抽出、画像最適化と保存の一連の処理を実行する
  * @param targetDir 保存先ディレクトリ
  */
-const optimize = async (srcRoot, distRoot, subDir) => {
-  let extension = imgExtension;
-  const list = getImageList(srcRoot, subDir, extension);
+const optimize = async (srcRoot, distRoot) => {
+  const list = getImageList(srcRoot, imgExtension);
 
   console.log(list);
   const encoders = [{ name: "mozJpeg" }, { name: "jpeg" }, { name: "webp" }];
-  await loadFiles(list, srcRoot, distRoot, subDir, encoders[0]);
-  await loadFiles(list, srcRoot, distRoot, subDir, encoders[1]);
-  await loadFiles(list, srcRoot, distRoot, subDir, encoders[2]);
+  await Promise.all(
+    encoders.map((encoder) => loadFiles(list, srcRoot, distRoot, encoder))
+  );
 };
 
 /**
@@ -48,7 +48,7 @@ const optimize = async (srcRoot, distRoot, subDir) => {
  * @param {Object} encoder - 使用するエンコーダ
  * @returns {Promise} - 全てのエンコードが完了したら解決するPromise
  */
-const loadFiles = (list, srcRoot, distRoot, subDir, encoder) => {
+const loadFiles = (list, srcRoot, distRoot, encoder) => {
   return new Promise((resolve, reject) => {
     const promiseArray = [];
 
@@ -137,10 +137,8 @@ const projectRoot = path.resolve(__dirname, "..");
 const srcDir = `${projectRoot}/src`;
 const distDir = `${projectRoot}/dist`;
 
-console.log(srcDir, distDir);
-
 const sizeData = {};
-optimize(srcDir, distDir, "/img/jpg_photo");
+optimize(srcDir, distDir);
 
 process.on("exit", function () {
   console.log("exiting program...");
