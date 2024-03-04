@@ -37,7 +37,7 @@
     "start": "webpack serve --config webpack.config.script.js --mode development",
     "javascript:dev": "webpack --config webpack.config.script.js --mode development",
     "javascript:production": "webpack --config webpack.config.script.js --mode production --progress --color",
-    "prepare": "husky install"
+    "prepare": "husky"
   },
   "lint-staged": {
     "*.{js,css,md}": "prettier --write"
