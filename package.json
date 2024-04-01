@@ -19,7 +19,7 @@
     "purecss": "^3.0.0",
     "sass": "^1.72.0",
     "serve": "^14.2.1",
-    "sharp": "^0.33.2",
+    "sharp": "^0.33.3",
     "webpack": "^5.90.3",
     "webpack-cli": "^5.1.4",
     "webpack-dev-server": "^5.0.4"
