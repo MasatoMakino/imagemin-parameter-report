@@ -20,7 +20,7 @@
     "sass": "^1.87.0",
     "serve": "^14.2.4",
     "sharp": "^0.34.1",
-    "webpack": "^5.99.7",
+    "webpack": "^5.99.8",
     "webpack-cli": "^6.0.1",
     "webpack-dev-server": "^5.2.1"
   },
