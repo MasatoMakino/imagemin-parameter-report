@@ -10,7 +10,7 @@
     "@babel/preset-env": "^7.28.0",
     "babel-loader": "^10.0.0",
     "chart.js": "^4.5.0",
-    "copy-webpack-plugin": "^13.0.0",
+    "copy-webpack-plugin": "^13.0.1",
     "glob": "^11.0.3",
     "husky": "^9.1.7",
     "lint-staged": "^16.1.5",
